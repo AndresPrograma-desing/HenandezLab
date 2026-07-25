@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, AlertTriangle } from 'lucide-react';
 import DataTable from '../components/ui/DataTable';
 import Modal from '../components/ui/Modal';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import axiosClient from '../api/axiosClient';
 
 export default function Inventory() {
@@ -9,6 +10,14 @@ export default function Inventory() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all'); // 'all', 'insumo', 'reactivo'
+  const [formError, setFormError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  // States for custom deletion confirmation modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const initialFormData = {
     name: '',
@@ -37,12 +46,14 @@ export default function Inventory() {
   const handleOpenCreate = () => {
     setEditingItem(null);
     setFormData(initialFormData);
+    setFormError('');
     setIsModalOpen(true);
   };
 
   // Abrir modal para editar
   const handleOpenEdit = (item) => {
     setEditingItem(item);
+    setFormError('');
     
     let formattedDate = '';
     if (item.expiration_date) {
@@ -65,11 +76,14 @@ export default function Inventory() {
     setIsModalOpen(false);
     setEditingItem(null);
     setFormData(initialFormData);
+    setFormError('');
   };
 
   // Guardar (crear o editar)
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSaving(true);
+    setFormError('');
     const request = editingItem
       ? axiosClient.put(`/inventory/${editingItem.id}`, formData)
       : axiosClient.post('/inventory', formData);
@@ -80,22 +94,38 @@ export default function Inventory() {
         handleCloseModal();
       })
       .catch((err) => {
-        alert(err.response?.data?.message || 'Error al guardar el ítem');
+        setFormError(err.response?.data?.message || 'Error al guardar el ítem');
+      })
+      .finally(() => {
+        setSaving(false);
       });
   };
 
-  // Eliminar
-  const handleDelete = (id) => {
-    if (window.confirm('¿Está seguro de que desea eliminar este ítem del inventario?')) {
-      axiosClient
-        .delete(`/inventory/${id}`)
-        .then(() => {
-          loadInventory();
-        })
-        .catch((err) => {
-          alert(err.response?.data?.message || 'Error al eliminar el ítem');
-        });
-    }
+  // Solicitar eliminación (abre modal)
+  const handleDeleteRequest = (item) => {
+    setItemToDelete(item);
+    setDeleteError('');
+    setIsDeleteModalOpen(true);
+  };
+
+  // Confirmar eliminación
+  const handleConfirmDelete = () => {
+    if (!itemToDelete) return;
+    setIsDeleting(true);
+    setDeleteError('');
+    axiosClient
+      .delete(`/inventory/${itemToDelete.id}`)
+      .then(() => {
+        loadInventory();
+        setIsDeleteModalOpen(false);
+        setItemToDelete(null);
+      })
+      .catch((err) => {
+        setDeleteError(err.response?.data?.message || 'Error al eliminar el ítem');
+      })
+      .finally(() => {
+        setIsDeleting(false);
+      });
   };
 
   // Filtrar ítems por la categoría seleccionada
@@ -162,7 +192,7 @@ export default function Inventory() {
             <Pencil className="h-4 w-4" />
           </button>
           <button
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleDeleteRequest(row)}
             className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-red-600 transition"
             title="Eliminar"
           >
@@ -225,6 +255,7 @@ export default function Inventory() {
 
       <DataTable columns={columns} data={filteredItems} emptyMessage="No hay ítems registrados en esta categoría" />
 
+      {/* Save / Edit Modal */}
       <Modal
         open={isModalOpen}
         title={editingItem ? 'Editar Ítem del Inventario' : 'Agregar Ítem al Inventario'}
@@ -298,23 +329,60 @@ export default function Inventory() {
               className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
             />
           </div>
+
+          {/* Form Error Banner */}
+          {formError && (
+            <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-600 animate-in fade-in slide-in-from-top-1">
+              {formError}
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
             <button
               type="button"
+              disabled={saving}
               onClick={handleCloseModal}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              disabled={saving}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              Guardar
+              {saving ? 'Guardando...' : 'Guardar'}
             </button>
           </div>
         </form>
       </Modal>
+
+      {/* Custom Confirmation Modal */}
+      <ConfirmModal
+        open={isDeleteModalOpen}
+        title="¿Eliminar Ítem del Inventario?"
+        message={`Esta acción eliminará de forma permanente el ítem "${itemToDelete?.name}" del inventario. ¿Deseas continuar?`}
+        confirmText="Eliminar Ítem"
+        cancelText="Cancelar"
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setIsDeleteModalOpen(false)}
+        variant="danger"
+      />
+
+      {/* Delete Error Modal/Toast */}
+      {deleteError && (
+        <ConfirmModal
+          open={!!deleteError}
+          title="Error al Eliminar"
+          message={deleteError}
+          confirmText="Entendido"
+          cancelText=""
+          onConfirm={() => setDeleteError('')}
+          onClose={() => setDeleteError('')}
+          variant="warning"
+        />
+      )}
     </div>
   );
 }
