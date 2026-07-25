@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-clinic-50: #eff6ff;
+  --color-clinic-100: #dbeafe;
+  --color-clinic-500: #3b82f6;
+  --color-clinic-600: #2563eb;
+  --color-clinic-700: #1d4ed8;
+
+  --color-health-50: #ecfdf5;
+  --color-health-500: #10b981;
+  --color-health-600: #059669;
+
+  --color-warn-50: #fffbeb;
+  --color-warn-500: #f59e0b;
+  --color-warn-600: #d97706;
+
+  --font-sans: 'Segoe UI', system-ui, Roboto, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-700 antialiased;
+}
