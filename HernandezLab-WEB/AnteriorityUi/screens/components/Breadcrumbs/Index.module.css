@@ -1,0 +1,158 @@
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  animation: crumbEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--crumb-index, 0) * 45ms);
+}
+
+@keyframes crumbEnter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.homeIcon {
+  color: #7c9cff;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.breadcrumbs:hover .homeIcon {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+/* Clickable crumb: plain text weight/size, with an animated underline that
+   grows from the left on hover instead of a boxy button background. */
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  padding: 3px 2px;
+  margin: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #9ba1ae;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.18s ease;
+}
+
+.linkLabel {
+  position: relative;
+  display: inline-block;
+}
+
+.linkLabel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link:hover,
+.link:focus-visible {
+  color: #e6e8ec;
+}
+
+.link:hover .linkLabel::after,
+.link:focus-visible .linkLabel::after {
+  transform: scaleX(1);
+}
+
+.link:active {
+  color: #7c9cff;
+  transition: color 0.05s ease;
+}
+
+.link:focus-visible {
+  outline: 2px solid #7c9cff;
+  outline-offset: 2px;
+}
+
+.crumbText {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #9ba1ae;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 360px;
+}
+
+/* Current page: a soft pill instead of plain text, with a quick pulse on
+   mount so a newly-arrived crumb (e.g. opening a session) draws the eye. */
+.current {
+  font-weight: 700;
+  color: #e6e8ec;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(124, 156, 255, 0.14);
+  animation: currentPulse 0.5s ease;
+}
+
+@keyframes currentPulse {
+  from {
+    background: rgba(124, 156, 255, 0.32);
+    transform: scale(1.03);
+  }
+  to {
+    background: rgba(124, 156, 255, 0.14);
+    transform: scale(1);
+  }
+}
+
+.separator {
+  color: #4b5563;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: none;
+  }
+
+  .current {
+    animation: none;
+  }
+
+  .homeIcon,
+  .link,
+  .linkLabel::after {
+    transition: none;
+  }
+}
