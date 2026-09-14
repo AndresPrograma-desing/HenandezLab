@@ -1,17 +1,69 @@
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import { TEXTS } from './constants/texts';
-import styles from './App.module.css';
-
-const theme = createTheme();
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { theme } from './styles/theme';
+import { ROUTES } from './constants/routes';
+import { AuthProvider } from './hooks/useAuth';
+import { SucursalActivaProvider } from './hooks/useSucursalActiva';
+import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { RoleGate } from './components/layout/RoleGate';
+import { DashboardLayout } from './components/layout/DashboardLayout';
+import { LoginPage } from './features/auth/LoginPage';
+import { DashboardPage } from './features/dashboard';
+import { UsuariosPage } from './features/usuarios';
+import { SucursalesPage } from './features/sucursales';
+import { InventarioPage } from './features/inventario';
+import { SolicitudesPage } from './features/solicitudes';
+import { ProveedoresPage } from './features/proveedores';
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className={styles.scaffold}>
-        <h1>{TEXTS.scaffold.title}</h1>
-        <p>{TEXTS.scaffold.placeholder}</p>
-      </div>
+      <BrowserRouter>
+        <AuthProvider>
+          <SucursalActivaProvider>
+            <Routes>
+              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+                <Route path={ROUTES.SOLICITUDES} element={<SolicitudesPage />} />
+                <Route path={ROUTES.INVENTARIO} element={<InventarioPage />} />
+                <Route
+                  path={ROUTES.USUARIOS}
+                  element={
+                    <RoleGate allowedRoles={['administrativo']}>
+                      <UsuariosPage />
+                    </RoleGate>
+                  }
+                />
+                <Route
+                  path={ROUTES.SUCURSALES}
+                  element={
+                    <RoleGate allowedRoles={['administrativo']}>
+                      <SucursalesPage />
+                    </RoleGate>
+                  }
+                />
+                <Route
+                  path={ROUTES.PROVEEDORES}
+                  element={
+                    <RoleGate allowedRoles={['administrativo']}>
+                      <ProveedoresPage />
+                    </RoleGate>
+                  }
+                />
+              </Route>
+              <Route path="*" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+            </Routes>
+          </SucursalActivaProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

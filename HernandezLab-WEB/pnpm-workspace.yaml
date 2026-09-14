@@ -2,3 +2,9 @@ packages:
   - '.'
 allowBuilds:
   esbuild: true
+publicHoistPattern:
+  - '*prop-types*'
+  - '*react-is*'
+  - '*hoist-non-react-statics*'
+  - '*@emotion*'
+  - '*@mui*'

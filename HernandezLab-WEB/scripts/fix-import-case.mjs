@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const SCAN_DIRS = ['src', 'AnteriorityUi/screens'];
+const SCAN_DIRS = ['src'];
 const FILE_EXTENSIONS = new Set(['.js', '.jsx']);
 const RESOLVE_EXTENSIONS = ['.jsx', '.js', '.module.css', '.css'];
 const IMPORT_RE = /(?:\bfrom\s+|\brequire\(\s*|\bimport\(\s*|\bimport\s+)(['"])(\.[^'"]+)\1/g;

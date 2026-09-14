@@ -1,0 +1,56 @@
+/* Variables CSS globales que consume anteriority-ui. Verde
+   como color primario/de acento (en vez del azul original de la librería) —
+   ver [[feedback-selector-needs-unique-id]]-style memory: cualquier componente
+   nuevo debería leer estos tokens en vez de hardcodear colores. */
+
+:root {
+  --color-primary: #16a34a;
+  --color-secondary: #2563eb;
+  --color-danger: #dc2626;
+  --color-black: #0f172a;
+  --color-white: #ffffff;
+
+  --btn-blue: #2563eb;
+  --btn-login: #16a34a;
+  --button-blue: #2563eb;
+  --button-green: #16a34a;
+  --button-red: #dc2626;
+  --cancel-button: #dc2626;
+
+  /* Alias: algunos componentes de la librería (SubSidebarLayout, TableB) leen
+     --primary-color en vez de --color-primary, y TableA lee --SW-red para su
+     estado de error. Se apuntan al mismo verde/rojo para no tener dos fuentes
+     de verdad para el mismo color. */
+  --primary-color: var(--color-primary);
+  --SW-red: var(--color-danger);
+
+  --border-color: rgba(15, 23, 42, 0.1);
+  --border-gray-low: rgba(15, 23, 42, 0.08);
+  --color-border: rgba(15, 23, 42, 0.1);
+  --color-background-elevated: #ffffff;
+  --color-card-bg: #ffffff;
+
+  --text-color: #0f172a;
+  --white: #ffffff;
+  --letter-white: #0f172a;
+
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-900: #0f172a;
+
+  --sidebar-bg: rgba(220, 252, 231, 0.8);
+  --sidebar-blur: blur(8px);
+  --sidebar-border: rgba(15, 23, 42, 0.08);
+  --sidebar-border-right: 1px solid rgba(15, 23, 42, 0.08);
+  --sidebar-hover-bg: rgba(22, 163, 74, 0.12);
+  --sidebar-text: #0f172a;
+  --sidebar-text-active: #16a34a;
+  --sidebar-text-muted: #64748b;
+
+  --tag-bg: rgba(22, 163, 74, 0.12);
+  --tag-text: #16a34a;
+}
