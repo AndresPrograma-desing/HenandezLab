@@ -1,0 +1,9 @@
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sinPrecio {
+  color: #9ca3af;
+  font-style: italic;
+}

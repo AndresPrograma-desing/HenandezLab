@@ -9,11 +9,16 @@ const ESTADO_COLORS = {
   entregado: '#088d4f',
 };
 
-export const SolicitudesTable = ({ solicitudes, isLoading, error, onRetry }) => {
+export const SolicitudesTable = ({ solicitudes, isLoading, error, onRetry, emptyMessage }) => {
   const columns = [
     {
       header: TEXTS.solicitudes.table.paciente,
-      render: (row) => `${row.pacientes?.nombre ?? ''} ${row.pacientes?.apellido ?? ''}`.trim() || '—',
+      render: (row) => {
+        const nombre = `${row.pacientes?.nombre ?? ''} ${row.pacientes?.apellido ?? ''}`.trim();
+        const cedula = row.pacientes?.cedula;
+        if (!nombre) return '—';
+        return cedula ? `${nombre} (${cedula})` : nombre;
+      },
     },
     { header: TEXTS.solicitudes.table.fecha, accessor: 'fecha_solicitud' },
     {
@@ -42,7 +47,7 @@ export const SolicitudesTable = ({ solicitudes, isLoading, error, onRetry }) => 
       error={error?.message}
       onRetry={onRetry}
       emptyIcon={ClipboardList}
-      emptyMessage={TEXTS.solicitudes.empty}
+      emptyMessage={emptyMessage ?? TEXTS.solicitudes.empty}
     />
   );
 };

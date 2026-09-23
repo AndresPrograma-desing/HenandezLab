@@ -18,7 +18,7 @@ export const useSolicitudes = (idSucursal) => {
 
     const { data, error: fetchError } = await supabase
       .from('solicitudes')
-      .select('*, pacientes(nombre, apellido), detalle_solicitud(id_examen, examenes(nombre_examen))')
+      .select('*, pacientes(nombre, apellido, cedula), detalle_solicitud(id_examen, examenes(nombre_examen))')
       .eq('id_sucursal', idSucursal)
       .order('fecha_solicitud', { ascending: false });
 

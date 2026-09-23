@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TEXTS } from '../../../../constants/texts';
 import { validateRequerido } from '../../../../utils/validators';
+import { useDuplicateCheck } from '../../../../hooks/useDuplicateCheck';
 import DrawPanel from 'anteriority-ui/screens/components/DrawPanel/index';
 import Input from 'anteriority-ui/screens/components/Input/index';
 import styles from './index.module.css';
@@ -16,6 +17,7 @@ export const ProveedorFormModal = ({ open, proveedor, onSubmit, onCancel, isSubm
   const isEdit = Boolean(proveedor);
   const [values, setValues] = useState(emptyValues);
   const [fieldErrors, setFieldErrors] = useState({});
+  const { checkDuplicado } = useDuplicateCheck();
 
   useEffect(() => {
     if (!open) return;
@@ -34,13 +36,28 @@ export const ProveedorFormModal = ({ open, proveedor, onSubmit, onCancel, isSubm
 
   const setField = (field) => (value) => setValues((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (event) => {
+  const handleRifBlur = async () => {
+    if (isEdit) return;
+    if (validateRequerido(values.rif_cedula, TEXTS.proveedores.form.rifLabel)) return;
+
+    const existe = await checkDuplicado('proveedores', { rif_cedula: values.rif_cedula.trim() });
+    if (existe) {
+      setFieldErrors((prev) => ({ ...prev, rif_cedula: TEXTS.proveedores.avisos.rifDuplicado }));
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const errors = {
       rif_cedula: validateRequerido(values.rif_cedula, TEXTS.proveedores.form.rifLabel),
       razon_social: validateRequerido(values.razon_social, TEXTS.proveedores.form.razonSocialLabel),
     };
+
+    if (!isEdit && !errors.rif_cedula) {
+      const existe = await checkDuplicado('proveedores', { rif_cedula: values.rif_cedula.trim() });
+      if (existe) errors.rif_cedula = TEXTS.proveedores.avisos.rifDuplicado;
+    }
 
     const hasErrors = Object.values(errors).some(Boolean);
     setFieldErrors(errors);
@@ -66,6 +83,7 @@ export const ProveedorFormModal = ({ open, proveedor, onSubmit, onCancel, isSubm
           label={TEXTS.proveedores.form.rifLabel}
           value={values.rif_cedula}
           onChange={(event) => setField('rif_cedula')(event.target.value)}
+          onBlur={handleRifBlur}
           error={fieldErrors.rif_cedula}
           disabled={isEdit}
           required

@@ -4,10 +4,35 @@
   gap: 0.25rem;
 }
 
+.stockActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  padding-right: 0.5rem;
+  border-right: 1px solid #e5e7eb;
+}
+
 .stockBajo {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   color: #dc2626;
+  font-weight: 600;
+}
+
+.vencimientoVencido,
+.vencimientoPorVencer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vencimientoVencido {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.vencimientoPorVencer {
+  color: #d97706;
   font-weight: 600;
 }

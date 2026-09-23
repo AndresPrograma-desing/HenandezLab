@@ -10,7 +10,10 @@ export const UsuariosTable = ({ usuarios, isLoading, error, onRetry, onEdit, onD
     { header: TEXTS.usuarios.table.cedula, accessor: 'cedula' },
     { header: TEXTS.usuarios.table.nombre, accessor: 'nombre' },
     { header: TEXTS.usuarios.table.apellido, accessor: 'apellido' },
-    { header: TEXTS.usuarios.table.cargo, accessor: 'cargo' },
+    {
+      header: TEXTS.usuarios.table.cargo,
+      render: (row) => TEXTS.usuarios.cargos[row.cargo] ?? row.cargo,
+    },
     {
       header: TEXTS.usuarios.table.rol,
       render: (row) => TEXTS.roles[row.rol] ?? row.rol,

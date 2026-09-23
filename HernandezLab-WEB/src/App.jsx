@@ -14,6 +14,7 @@ import { SucursalesPage } from './features/sucursales';
 import { InventarioPage } from './features/inventario';
 import { SolicitudesPage } from './features/solicitudes';
 import { ProveedoresPage } from './features/proveedores';
+import { PreciosPage } from './features/precios';
 
 function App() {
   return (
@@ -55,6 +56,14 @@ function App() {
                   element={
                     <RoleGate allowedRoles={['administrativo']}>
                       <ProveedoresPage />
+                    </RoleGate>
+                  }
+                />
+                <Route
+                  path={ROUTES.PRECIOS}
+                  element={
+                    <RoleGate allowedRoles={['administrativo']}>
+                      <PreciosPage />
                     </RoleGate>
                   }
                 />

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, ClipboardList, Boxes, Users, Building2, Truck, LogOut } from 'lucide-react';
+import { Home, ClipboardList, Boxes, Users, Building2, Truck, Tag, LogOut } from 'lucide-react';
 import { ROUTES } from '../../../constants/routes';
 import { TEXTS } from '../../../constants/texts';
 import { useAuth } from '../../../hooks/useAuth';
@@ -26,6 +26,7 @@ const buildGroups = (rol) => {
       { id: ROUTES.USUARIOS, label: TEXTS.layout.nav.usuarios, icon: Users },
       { id: ROUTES.SUCURSALES, label: TEXTS.layout.nav.sucursales, icon: Building2 },
       { id: ROUTES.PROVEEDORES, label: TEXTS.layout.nav.proveedores, icon: Truck },
+      { id: ROUTES.PRECIOS, label: TEXTS.layout.nav.precios, icon: Tag },
     ],
   };
 

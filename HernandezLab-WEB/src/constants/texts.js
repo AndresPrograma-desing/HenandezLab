@@ -31,6 +31,7 @@ export const TEXTS = {
       inventario: 'Inventario',
       solicitudes: 'Solicitudes',
       proveedores: 'Proveedores',
+      precios: 'Precios',
     },
   },
   sucursalSelector: {
@@ -45,6 +46,9 @@ export const TEXTS = {
     total: 'Total',
     guardando: 'Guardando...',
     eliminando: 'Eliminando...',
+    cargando: 'Cargando...',
+    reintentar: 'Reintentar',
+    errorCarga: 'Ocurrió un error al cargar los datos.',
   },
   usuarios: {
     title: 'Usuarios',
@@ -52,6 +56,14 @@ export const TEXTS = {
     editButton: 'Editar',
     deleteButton: 'Eliminar',
     empty: 'Aún no hay usuarios registrados.',
+    cargos: {
+      administrador: 'Administrador',
+      bioanalista: 'Bioanalista',
+      tecnico_laboratorio: 'Técnico de laboratorio',
+      flebotomista: 'Flebotomista',
+      recepcionista: 'Recepcionista',
+      mensajero: 'Mensajero',
+    },
     table: {
       cedula: 'Cédula',
       nombre: 'Nombre',
@@ -88,6 +100,9 @@ export const TEXTS = {
     errors: {
       generico: 'Ocurrió un error al guardar. Intenta de nuevo.',
       cedulaDuplicada: 'Ya existe un empleado con esa cédula.',
+    },
+    avisos: {
+      cedulaDuplicada: 'Ya existe un empleado registrado con esta cédula.',
     },
   },
   sucursales: {
@@ -156,6 +171,9 @@ export const TEXTS = {
       generico: 'Ocurrió un error al guardar. Intenta de nuevo.',
       rifDuplicado: 'Ya existe un proveedor con ese RIF/cédula.',
     },
+    avisos: {
+      rifDuplicado: 'Ya existe un proveedor registrado con este RIF/cédula.',
+    },
   },
   inventario: {
     title: 'Inventario',
@@ -164,6 +182,7 @@ export const TEXTS = {
     deleteButton: 'Eliminar',
     empty: 'No hay ítems en esta categoría.',
     stockBajo: 'Stock bajo',
+    stockExceso: 'Sobre stock máximo',
     sinProveedor: 'Sin proveedor',
     categorias: {
       insumos: 'Insumos',
@@ -176,6 +195,7 @@ export const TEXTS = {
       nombre: 'Nombre',
       stockActual: 'Stock actual',
       stockMinimo: 'Stock mínimo',
+      stockMaximo: 'Stock máximo',
       fechaVencimiento: 'Vencimiento',
       lote: 'Lote',
       proveedor: 'Proveedor',
@@ -188,6 +208,7 @@ export const TEXTS = {
       nombreLabel: 'Nombre',
       stockActualLabel: 'Stock actual',
       stockMinimoLabel: 'Stock mínimo',
+      stockMaximoLabel: 'Stock máximo',
       fechaVencimientoLabel: 'Fecha de vencimiento',
       loteLabel: 'Lote',
       proveedorLabel: 'Proveedor',
@@ -205,12 +226,70 @@ export const TEXTS = {
     errors: {
       generico: 'Ocurrió un error al guardar. Intenta de nuevo.',
       codigoDuplicado: 'Ya existe un ítem con ese código en esta sucursal.',
+      stockMaximoMenorAlMinimo: 'El stock máximo no puede ser menor al stock mínimo.',
+      cantidadInvalida: 'Ingresa una cantidad mayor a cero.',
+      stockInsuficiente: 'No hay stock suficiente para sacar esa cantidad.',
+    },
+    avisos: {
+      codigoDuplicado: 'Ya existe un ítem con este código en esta sucursal.',
+    },
+    vencimiento: {
+      vencido: 'Vencido',
+      vencidoHace: (dias) => `Venció hace ${dias} día${dias === 1 ? '' : 's'}`,
+      hoy: 'Vence hoy',
+      porVencer: (dias) => `Vence en ${dias} día${dias === 1 ? '' : 's'}`,
+    },
+    movimientos: {
+      agregarCompra: 'Agregar compra',
+      sacarStock: 'Sacar stock',
+      seccionTitle: 'Movimientos de stock',
+      compraTitle: (nombre) => `Registrar compra — ${nombre}`,
+      salidaTitle: (nombre) => `Sacar stock — ${nombre}`,
+      cantidadLabel: 'Cantidad',
+      cantidadCompraHelper: 'Cantidad que ingresa al inventario.',
+      cantidadSalidaHelper: 'Cantidad que se descuenta del inventario.',
+      motivoLabel: 'Motivo',
+      motivoPlaceholder: 'Ej: dañado, vencido, uso interno...',
+      loteLabel: 'Lote (opcional)',
+      fechaVencimientoLabel: 'Nueva fecha de vencimiento (opcional)',
+      proveedorLabel: 'Proveedor (opcional)',
+      stockResultante: (stock) => `Stock resultante: ${stock}`,
+      submitCompra: 'Registrar compra',
+      submitSalida: 'Registrar salida',
+      cancel: 'Cancelar',
+    },
+  },
+  precios: {
+    title: 'Precios',
+    empty: 'No hay ítems con precio configurado en esta sucursal.',
+    editButton: 'Editar precio',
+    sinPrecio: 'Sin precio',
+    table: {
+      codigo: 'Código',
+      nombre: 'Nombre',
+      categoria: 'Categoría',
+      stockActual: 'Stock actual',
+      precio: 'Precio',
+    },
+    form: {
+      editTitle: (nombre) => `Editar precio — ${nombre}`,
+      precioLabel: 'Precio',
+      submitEdit: 'Guardar precio',
+      cancel: 'Cancelar',
+    },
+    errors: {
+      generico: 'Ocurrió un error al guardar el precio. Intenta de nuevo.',
     },
   },
   solicitudes: {
     title: 'Solicitudes',
     createButton: 'Nueva solicitud',
     empty: 'Aún no hay solicitudes registradas.',
+    emptyFiltrado: 'Ninguna solicitud coincide con la búsqueda.',
+    busqueda: {
+      placeholder: 'Buscar por paciente o cédula...',
+      filtroEstadoTodas: 'Todas',
+    },
     table: {
       paciente: 'Paciente',
       fecha: 'Fecha',
@@ -245,5 +324,21 @@ export const TEXTS = {
       stockInsuficiente: 'No hay stock suficiente para completar esta solicitud.',
       seleccionaExamen: 'Selecciona al menos un examen.',
     },
+  },
+  dashboard: {
+    title: 'Inicio',
+    saludo: (nombre) => `Hola, ${nombre}`,
+    subtitulo: 'Resumen de la actividad de tu sucursal.',
+    sinSucursal: 'Selecciona una sucursal activa para ver su resumen.',
+    tarjetas: {
+      solicitudesPendientes: 'Solicitudes pendientes',
+      stockBajo: 'Ítems con stock bajo',
+      porVencer: 'Ítems por vencer',
+      totalInventario: 'Ítems en inventario',
+      usuariosActivos: 'Usuarios activos',
+      sucursalesActivas: 'Sucursales activas',
+    },
+    accesosRapidos: 'Accesos rápidos',
+    verTodas: 'Ver todas',
   },
 };

@@ -6,4 +6,5 @@ export const ROUTES = {
   INVENTARIO: '/inventario',
   SOLICITUDES: '/solicitudes',
   PROVEEDORES: '/proveedores',
+  PRECIOS: '/precios',
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TEXTS } from '../../../../constants/texts';
 import { validateRequerido, validateNumero } from '../../../../utils/validators';
+import { useDuplicateCheck } from '../../../../hooks/useDuplicateCheck';
 import DrawPanel from 'anteriority-ui/screens/components/DrawPanel/index';
 import Input from 'anteriority-ui/screens/components/Input/index';
 import Selector from 'anteriority-ui/screens/components/Material-UI/Components/Selector/index';
@@ -12,6 +13,7 @@ const buildEmptyValues = (categoria) => ({
   nombre: '',
   stock_actual: '',
   stock_minimo: '',
+  stock_maximo: '',
   fecha_vencimiento: '',
   lote: '',
   id_proveedor: '',
@@ -27,6 +29,7 @@ export const InventarioFormModal = ({
   item,
   categoriaActiva,
   proveedores,
+  idSucursalActiva,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -35,6 +38,7 @@ export const InventarioFormModal = ({
   const isEdit = Boolean(item);
   const [values, setValues] = useState(buildEmptyValues(categoriaActiva));
   const [fieldErrors, setFieldErrors] = useState({});
+  const { checkDuplicado } = useDuplicateCheck();
 
   useEffect(() => {
     if (!open) return;
@@ -47,6 +51,7 @@ export const InventarioFormModal = ({
             nombre: item.nombre,
             stock_actual: String(item.stock_actual),
             stock_minimo: String(item.stock_minimo),
+            stock_maximo: item.stock_maximo != null ? String(item.stock_maximo) : '',
             fecha_vencimiento: item.fecha_vencimiento ?? '',
             lote: item.lote ?? '',
             id_proveedor: item.id_proveedor ?? '',
@@ -62,7 +67,20 @@ export const InventarioFormModal = ({
 
   const setField = (field) => (value) => setValues((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (event) => {
+  const handleCodigoBlur = async () => {
+    if (isEdit) return;
+    if (validateRequerido(values.codigo, TEXTS.inventario.form.codigoLabel)) return;
+
+    const existe = await checkDuplicado('inventario', {
+      codigo: values.codigo.trim(),
+      id_sucursal: idSucursalActiva,
+    });
+    if (existe) {
+      setFieldErrors((prev) => ({ ...prev, codigo: TEXTS.inventario.avisos.codigoDuplicado }));
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const errors = {
@@ -71,7 +89,27 @@ export const InventarioFormModal = ({
       nombre: validateRequerido(values.nombre, TEXTS.inventario.form.nombreLabel),
       stock_actual: validateNumero(values.stock_actual, TEXTS.inventario.form.stockActualLabel, { min: 0 }),
       stock_minimo: validateNumero(values.stock_minimo, TEXTS.inventario.form.stockMinimoLabel, { min: 0 }),
+      stock_maximo:
+        values.stock_maximo === ''
+          ? null
+          : validateNumero(values.stock_maximo, TEXTS.inventario.form.stockMaximoLabel, { min: 0 }),
     };
+
+    if (
+      !errors.stock_maximo &&
+      values.stock_maximo !== '' &&
+      Number(values.stock_maximo) < Number(values.stock_minimo || 0)
+    ) {
+      errors.stock_maximo = TEXTS.inventario.errors.stockMaximoMenorAlMinimo;
+    }
+
+    if (!isEdit && !errors.codigo) {
+      const existe = await checkDuplicado('inventario', {
+        codigo: values.codigo.trim(),
+        id_sucursal: idSucursalActiva,
+      });
+      if (existe) errors.codigo = TEXTS.inventario.avisos.codigoDuplicado;
+    }
 
     const hasErrors = Object.values(errors).some(Boolean);
     setFieldErrors(errors);
@@ -83,6 +121,7 @@ export const InventarioFormModal = ({
       nombre: values.nombre,
       stock_actual: Number(values.stock_actual),
       stock_minimo: Number(values.stock_minimo),
+      stock_maximo: values.stock_maximo === '' ? null : Number(values.stock_maximo),
       fecha_vencimiento: values.fecha_vencimiento || null,
       lote: values.lote || null,
       id_proveedor: values.id_proveedor || null,
@@ -116,7 +155,9 @@ export const InventarioFormModal = ({
           label={TEXTS.inventario.form.codigoLabel}
           value={values.codigo}
           onChange={(event) => setField('codigo')(event.target.value)}
+          onBlur={handleCodigoBlur}
           error={fieldErrors.codigo}
+          disabled={isEdit}
           required
         />
         <Input
@@ -141,6 +182,13 @@ export const InventarioFormModal = ({
           onChange={(event) => setField('stock_minimo')(event.target.value)}
           error={fieldErrors.stock_minimo}
           required
+        />
+        <Input
+          label={TEXTS.inventario.form.stockMaximoLabel}
+          type="number"
+          value={values.stock_maximo}
+          onChange={(event) => setField('stock_maximo')(event.target.value)}
+          error={fieldErrors.stock_maximo}
         />
         <Input
           label={TEXTS.inventario.form.fechaVencimientoLabel}

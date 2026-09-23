@@ -66,6 +66,27 @@ export const useInventario = (idSucursal) => {
     setItems((prev) => prev.filter((item) => item.id_item !== idItem));
   };
 
+  /**
+   * Registra una entrada (compra) o salida de stock para un ítem existente,
+   * ajustando stock_actual y, en el caso de una compra, opcionalmente el
+   * lote y la fecha de vencimiento.
+   */
+  const registrarMovimiento = async (item, { tipo, cantidad, lote, fecha_vencimiento }) => {
+    const nuevoStock = tipo === 'compra' ? Number(item.stock_actual) + cantidad : Number(item.stock_actual) - cantidad;
+
+    if (nuevoStock < 0) {
+      throw new Error('stock_insuficiente');
+    }
+
+    const changes = { stock_actual: nuevoStock };
+    if (tipo === 'compra') {
+      if (lote) changes.lote = lote;
+      if (fecha_vencimiento) changes.fecha_vencimiento = fecha_vencimiento;
+    }
+
+    return updateItem(item.id_item, changes);
+  };
+
   return {
     items,
     isLoading,
@@ -74,5 +95,6 @@ export const useInventario = (idSucursal) => {
     createItem,
     updateItem,
     deleteItem,
+    registrarMovimiento,
   };
 };
