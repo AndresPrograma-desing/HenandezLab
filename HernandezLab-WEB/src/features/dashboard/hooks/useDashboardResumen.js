@@ -48,7 +48,7 @@ export const useDashboardResumen = (idSucursalActiva, { esAdministrativo = false
         esAdministrativo
           ? Promise.all([
               supabase.from('empleados').select('cedula', { count: 'exact', head: true }).eq('estado_activo', true),
-              supabase.from('sucursales').select('id_sucursal', { count: 'exact', head: true }).eq('estado_activo', true),
+              supabase.from('sucursales').select('id_sucursal', { count: 'exact', head: true }).eq('activo', true),
             ])
           : Promise.resolve(null),
       ]);

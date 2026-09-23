@@ -20,6 +20,15 @@
   gap: 0.25rem;
 }
 
+/* El componente Checks de anteriority-ui trae por defecto un color de texto
+   (#e5e7eb) pensado para fondos oscuros, casi ilegible sobre blanco. Como
+   es un CSS module de la librería no podemos sobreescribir su clase
+   directamente, así que apuntamos a la clase global que sí expone
+   (MuiButtonBase-root) para forzar un color legible en ambos estados. */
+.list :global(.MuiButtonBase-root) > span:last-child {
+  color: #1f2937 !important;
+}
+
 .preview {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
