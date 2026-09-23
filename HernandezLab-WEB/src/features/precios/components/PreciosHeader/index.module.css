@@ -14,20 +14,3 @@
 .titleRow h2 {
   margin: 0;
 }
-
-.filtros {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
-}
-
-.busqueda {
-  min-width: 260px;
-}
-
-.estadoTabs {
-  display: flex;
-  gap: 0.25rem;
-}

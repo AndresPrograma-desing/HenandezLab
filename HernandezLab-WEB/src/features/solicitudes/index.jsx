@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TEXTS } from '../../constants/texts';
 import { useAuth } from '../../hooks/useAuth';
 import { useSucursalActiva } from '../../hooks/useSucursalActiva';
@@ -24,6 +24,21 @@ export const SolicitudesPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+
+  const [search, setSearch] = useState('');
+  const [estadoFiltro, setEstadoFiltro] = useState('pendiente');
+
+  const solicitudesFiltradas = useMemo(() => {
+    const termino = search.trim().toLowerCase();
+    return solicitudes.filter((solicitud) => {
+      if (estadoFiltro !== 'todas' && solicitud.estado !== estadoFiltro) return false;
+      if (!termino) return true;
+
+      const nombre = `${solicitud.pacientes?.nombre ?? ''} ${solicitud.pacientes?.apellido ?? ''}`.toLowerCase();
+      const cedula = (solicitud.pacientes?.cedula ?? '').toLowerCase();
+      return nombre.includes(termino) || cedula.includes(termino);
+    });
+  }, [solicitudes, search, estadoFiltro]);
 
   const openCreate = () => {
     setSubmitError(null);
@@ -54,8 +69,21 @@ export const SolicitudesPage = () => {
 
   return (
     <div>
-      <SolicitudesHeader total={solicitudes.length} onCreate={openCreate} />
-      <SolicitudesTable solicitudes={solicitudes} isLoading={isLoading} error={error} onRetry={refetch} />
+      <SolicitudesHeader
+        total={solicitudesFiltradas.length}
+        onCreate={openCreate}
+        search={search}
+        onSearchChange={setSearch}
+        estadoFiltro={estadoFiltro}
+        onEstadoFiltroChange={setEstadoFiltro}
+      />
+      <SolicitudesTable
+        solicitudes={solicitudesFiltradas}
+        isLoading={isLoading}
+        error={error}
+        onRetry={refetch}
+        emptyMessage={search.trim() ? TEXTS.solicitudes.emptyFiltrado : undefined}
+      />
 
       <SolicitudFormModal
         open={isFormOpen}

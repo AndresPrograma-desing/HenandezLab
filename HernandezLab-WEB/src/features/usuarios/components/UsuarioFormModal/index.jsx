@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TEXTS } from '../../../../constants/texts';
 import { validateCedula, validateNombre, validateRequerido } from '../../../../utils/validators';
+import { useDuplicateCheck } from '../../../../hooks/useDuplicateCheck';
 import DrawPanel from 'anteriority-ui/screens/components/DrawPanel/index';
 import Input from 'anteriority-ui/screens/components/Input/index';
 import Selector from 'anteriority-ui/screens/components/Material-UI/Components/Selector/index';
@@ -22,6 +23,8 @@ const rolOptions = [
   { value: 'recepcion', label: TEXTS.roles.recepcion },
 ];
 
+const cargoOptions = Object.entries(TEXTS.usuarios.cargos).map(([value, label]) => ({ value, label }));
+
 export const UsuarioFormModal = ({
   open,
   usuario,
@@ -34,6 +37,7 @@ export const UsuarioFormModal = ({
   const isEdit = Boolean(usuario);
   const [values, setValues] = useState(emptyValues);
   const [fieldErrors, setFieldErrors] = useState({});
+  const { checkDuplicado } = useDuplicateCheck();
 
   useEffect(() => {
     if (!open) return;
@@ -57,7 +61,18 @@ export const UsuarioFormModal = ({
 
   const setField = (field) => (value) => setValues((prev) => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (event) => {
+  const handleCedulaBlur = async () => {
+    if (isEdit) return;
+    const cedulaError = validateCedula(values.cedula);
+    if (cedulaError) return;
+
+    const existe = await checkDuplicado('empleados', { cedula: values.cedula.trim() });
+    if (existe) {
+      setFieldErrors((prev) => ({ ...prev, cedula: TEXTS.usuarios.avisos.cedulaDuplicada }));
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const errors = {
@@ -68,6 +83,11 @@ export const UsuarioFormModal = ({
       rol: validateRequerido(values.rol, TEXTS.usuarios.form.rolLabel),
       id_sucursal: validateRequerido(values.id_sucursal, TEXTS.usuarios.form.sucursalLabel),
     };
+
+    if (!isEdit && !errors.cedula) {
+      const existe = await checkDuplicado('empleados', { cedula: values.cedula.trim() });
+      if (existe) errors.cedula = TEXTS.usuarios.avisos.cedulaDuplicada;
+    }
 
     const hasErrors = Object.values(errors).some(Boolean);
     setFieldErrors(errors);
@@ -93,6 +113,7 @@ export const UsuarioFormModal = ({
           label={TEXTS.usuarios.form.cedulaLabel}
           value={values.cedula}
           onChange={(event) => setField('cedula')(event.target.value)}
+          onBlur={handleCedulaBlur}
           error={fieldErrors.cedula}
           helperText={!fieldErrors.cedula ? TEXTS.usuarios.form.cedulaHelper : undefined}
           disabled={isEdit}
@@ -112,13 +133,15 @@ export const UsuarioFormModal = ({
           error={fieldErrors.apellido}
           required
         />
-        <Input
+        <Selector
+          id="usuario-cargo"
           label={TEXTS.usuarios.form.cargoLabel}
+          options={cargoOptions}
           value={values.cargo}
           onChange={(event) => setField('cargo')(event.target.value)}
-          error={fieldErrors.cargo}
           required
         />
+        {fieldErrors.cargo && <p className={styles.selectError}>{fieldErrors.cargo}</p>}
         <Selector
           id="usuario-rol"
           label={TEXTS.usuarios.form.rolLabel}

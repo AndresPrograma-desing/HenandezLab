@@ -14,7 +14,7 @@ Sistema de gestión para laboratorio clínico HernandezLab: usuarios, sucursales
 
 - Node.js 18+
 - pnpm (el proyecto usa `pnpm-lock.yaml` y `pnpm-workspace.yaml`)
-- Un proyecto de Supabase con el esquema de [`../SQL/schema.sql`](../SQL/schema.sql) aplicado
+- Un proyecto de Supabase con el esquema de [`../SQL/schema.sql`](../SQL/schema.sql) aplicado, más la migración incremental de [`docs/migraciones/2026-09-23-ajustes.md`](docs/migraciones/2026-09-23-ajustes.md) (stock máximo y precio por ítem de inventario)
 
 ## Puesta en marcha
 
