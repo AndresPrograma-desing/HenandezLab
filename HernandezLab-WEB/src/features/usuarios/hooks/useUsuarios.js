@@ -4,18 +4,25 @@ import { supabase } from '../../../lib/supabaseClient';
 const sortByNombre = (list) =>
   [...list].sort((a, b) => `${a.nombre} ${a.apellido}`.localeCompare(`${b.nombre} ${b.apellido}`));
 
-export const useUsuarios = () => {
+export const useUsuarios = (idSucursal) => {
   const [usuarios, setUsuarios] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchUsuarios = useCallback(async () => {
+    if (!idSucursal) {
+      setUsuarios([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     const { data, error: fetchError } = await supabase
       .from('empleados')
-      .select('*, sucursales(nombre)');
+      .select('*, sucursales(nombre)')
+      .eq('id_sucursal', idSucursal);
 
     if (fetchError) {
       setError(fetchError);
@@ -23,7 +30,7 @@ export const useUsuarios = () => {
       setUsuarios(sortByNombre(data ?? []));
     }
     setIsLoading(false);
-  }, []);
+  }, [idSucursal]);
 
   useEffect(() => {
     fetchUsuarios();

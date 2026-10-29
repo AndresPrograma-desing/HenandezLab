@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react';
 import { TEXTS } from '../../constants/texts';
 import { useSucursalActiva } from '../../hooks/useSucursalActiva';
 import { useInventario } from './hooks/useInventario';
-import { useProveedores } from '../proveedores/hooks/useProveedores';
 import { InventarioHeader } from './components/InventarioHeader';
 import { CategoriaTabs } from './components/CategoriaTabs';
 import { InventarioTable } from './components/InventarioTable';
 import { InventarioFormModal } from './components/InventarioFormModal';
 import { StockMovimientoModal } from './components/StockMovimientoModal';
+import { HistorialLotesModal } from './components/HistorialLotesModal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
 
 const mapErrorToMessage = (error) => {
@@ -20,7 +20,6 @@ export const InventarioPage = () => {
   const { idSucursalActiva } = useSucursalActiva();
   const { items, isLoading, error, refetch, createItem, updateItem, deleteItem, registrarMovimiento } =
     useInventario(idSucursalActiva);
-  const { proveedores } = useProveedores();
 
   const [categoriaActiva, setCategoriaActiva] = useState('insumos');
   const [editingItem, setEditingItem] = useState(null);
@@ -32,9 +31,11 @@ export const InventarioPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
 
-  const [movimiento, setMovimiento] = useState(null); // { item, tipo }
+  const [movimiento, setMovimiento] = useState(null); // { item }
   const [isMovimientoSubmitting, setIsMovimientoSubmitting] = useState(false);
   const [movimientoError, setMovimientoError] = useState(null);
+
+  const [historialItem, setHistorialItem] = useState(null);
 
   const itemsFiltrados = useMemo(
     () => items.filter((item) => item.categoria === categoriaActiva),
@@ -113,15 +114,14 @@ export const InventarioPage = () => {
         onRetry={refetch}
         onEdit={openEdit}
         onDelete={setDeletingItem}
-        onRegistrarCompra={(item) => setMovimiento({ item, tipo: 'compra' })}
-        onSacarStock={(item) => setMovimiento({ item, tipo: 'salida' })}
+        onSacarStock={(item) => setMovimiento({ item })}
+        onViewHistorial={setHistorialItem}
       />
 
       <InventarioFormModal
         open={isFormOpen}
         item={editingItem}
         categoriaActiva={categoriaActiva}
-        proveedores={proveedores}
         idSucursalActiva={idSucursalActiva}
         onSubmit={handleSubmit}
         onCancel={closeForm}
@@ -132,12 +132,13 @@ export const InventarioPage = () => {
       <StockMovimientoModal
         open={Boolean(movimiento)}
         item={movimiento?.item ?? null}
-        tipo={movimiento?.tipo}
         onSubmit={handleMovimientoSubmit}
         onCancel={closeMovimiento}
         isSubmitting={isMovimientoSubmitting}
         submitError={movimientoError}
       />
+
+      <HistorialLotesModal item={historialItem} onClose={() => setHistorialItem(null)} />
 
       <ConfirmDeleteModal
         open={Boolean(deletingItem)}

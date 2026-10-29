@@ -14,9 +14,6 @@ const buildEmptyValues = (categoria) => ({
   stock_actual: '',
   stock_minimo: '',
   stock_maximo: '',
-  fecha_vencimiento: '',
-  lote: '',
-  id_proveedor: '',
 });
 
 const categoriaOptions = ['insumos', 'reactivos', 'mobiliario', 'maquinaria'].map((value) => ({
@@ -28,7 +25,6 @@ export const InventarioFormModal = ({
   open,
   item,
   categoriaActiva,
-  proveedores,
   idSucursalActiva,
   onSubmit,
   onCancel,
@@ -52,18 +48,10 @@ export const InventarioFormModal = ({
             stock_actual: String(item.stock_actual),
             stock_minimo: String(item.stock_minimo),
             stock_maximo: item.stock_maximo != null ? String(item.stock_maximo) : '',
-            fecha_vencimiento: item.fecha_vencimiento ?? '',
-            lote: item.lote ?? '',
-            id_proveedor: item.id_proveedor ?? '',
           }
         : buildEmptyValues(categoriaActiva)
     );
   }, [open, item, categoriaActiva]);
-
-  const proveedorOptions = [
-    { value: '', label: TEXTS.inventario.form.sinProveedorOption },
-    ...proveedores.map((p) => ({ value: p.id_proveedor, label: p.razon_social })),
-  ];
 
   const setField = (field) => (value) => setValues((prev) => ({ ...prev, [field]: value }));
 
@@ -122,9 +110,6 @@ export const InventarioFormModal = ({
       stock_actual: Number(values.stock_actual),
       stock_minimo: Number(values.stock_minimo),
       stock_maximo: values.stock_maximo === '' ? null : Number(values.stock_maximo),
-      fecha_vencimiento: values.fecha_vencimiento || null,
-      lote: values.lote || null,
-      id_proveedor: values.id_proveedor || null,
     });
   };
 
@@ -189,25 +174,6 @@ export const InventarioFormModal = ({
           value={values.stock_maximo}
           onChange={(event) => setField('stock_maximo')(event.target.value)}
           error={fieldErrors.stock_maximo}
-        />
-        <Input
-          label={TEXTS.inventario.form.fechaVencimientoLabel}
-          type="date"
-          value={values.fecha_vencimiento}
-          onChange={(event) => setField('fecha_vencimiento')(event.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
-        <Input
-          label={TEXTS.inventario.form.loteLabel}
-          value={values.lote}
-          onChange={(event) => setField('lote')(event.target.value)}
-        />
-        <Selector
-          id="inventario-proveedor"
-          label={TEXTS.inventario.form.proveedorLabel}
-          options={proveedorOptions}
-          value={values.id_proveedor}
-          onChange={(event) => setField('id_proveedor')(event.target.value)}
         />
 
         {submitError && <p className={styles.error}>{submitError}</p>}

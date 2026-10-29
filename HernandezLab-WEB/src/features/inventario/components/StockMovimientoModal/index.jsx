@@ -8,36 +8,29 @@ import styles from './index.module.css';
 const emptyValues = {
   cantidad: '',
   motivo: '',
-  lote: '',
-  fecha_vencimiento: '',
 };
 
 /**
- * Modal compartido para registrar entradas (compra) y salidas de stock de
- * un ítem de inventario. La sección se diferencia por color/copy según
- * `tipo` ('compra' | 'salida'), pero comparte el mismo formulario base.
+ * Registra una salida de stock (merma, uso manual, etc.) de un ítem de
+ * inventario. Las entradas (compras) se registran siempre desde la pantalla
+ * de Compras, que alimenta el historial de lotes.
  */
-export const StockMovimientoModal = ({ open, item, tipo, onSubmit, onCancel, isSubmitting = false, submitError = null }) => {
+export const StockMovimientoModal = ({ open, item, onSubmit, onCancel, isSubmitting = false, submitError = null }) => {
   const [values, setValues] = useState(emptyValues);
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const esCompra = tipo === 'compra';
   const textos = TEXTS.inventario.movimientos;
 
   useEffect(() => {
     if (!open) return;
     setValues(emptyValues);
     setFieldErrors({});
-  }, [open, item, tipo]);
+  }, [open, item]);
 
   const setField = (field) => (value) => setValues((prev) => ({ ...prev, [field]: value }));
 
   const cantidadNumero = Number(values.cantidad) || 0;
-  const stockResultante = item
-    ? esCompra
-      ? Number(item.stock_actual) + cantidadNumero
-      : Number(item.stock_actual) - cantidadNumero
-    : null;
+  const stockResultante = item ? Number(item.stock_actual) - cantidadNumero : null;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -47,7 +40,7 @@ export const StockMovimientoModal = ({ open, item, tipo, onSubmit, onCancel, isS
       cantidad: validateNumero(values.cantidad, textos.cantidadLabel, { min: 0.0001 }),
     };
 
-    if (!errors.cantidad && !esCompra && cantidadNumero > Number(item.stock_actual)) {
+    if (!errors.cantidad && cantidadNumero > Number(item.stock_actual)) {
       errors.cantidad = TEXTS.inventario.errors.stockInsuficiente;
     }
 
@@ -56,11 +49,8 @@ export const StockMovimientoModal = ({ open, item, tipo, onSubmit, onCancel, isS
     if (hasErrors) return;
 
     onSubmit({
-      tipo,
       cantidad: cantidadNumero,
       motivo: values.motivo || null,
-      lote: values.lote || null,
-      fecha_vencimiento: values.fecha_vencimiento || null,
     });
   };
 
@@ -68,10 +58,10 @@ export const StockMovimientoModal = ({ open, item, tipo, onSubmit, onCancel, isS
     <DrawPanel
       isOpen={open}
       onClose={onCancel}
-      title={item ? (esCompra ? textos.compraTitle(item.nombre) : textos.salidaTitle(item.nombre)) : ''}
+      title={item ? textos.salidaTitle(item.nombre) : ''}
       showActions
       formId="stock-movimiento-form"
-      confirmText={esCompra ? textos.submitCompra : textos.submitSalida}
+      confirmText={textos.submitSalida}
       cancelText={textos.cancel}
       loading={isSubmitting}
       formData={values}
@@ -83,33 +73,16 @@ export const StockMovimientoModal = ({ open, item, tipo, onSubmit, onCancel, isS
           value={values.cantidad}
           onChange={(event) => setField('cantidad')(event.target.value)}
           error={fieldErrors.cantidad}
-          helperText={!fieldErrors.cantidad ? (esCompra ? textos.cantidadCompraHelper : textos.cantidadSalidaHelper) : undefined}
+          helperText={!fieldErrors.cantidad ? textos.cantidadSalidaHelper : undefined}
           required
         />
 
-        {esCompra ? (
-          <>
-            <Input
-              label={textos.loteLabel}
-              value={values.lote}
-              onChange={(event) => setField('lote')(event.target.value)}
-            />
-            <Input
-              label={textos.fechaVencimientoLabel}
-              type="date"
-              value={values.fecha_vencimiento}
-              onChange={(event) => setField('fecha_vencimiento')(event.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-          </>
-        ) : (
-          <Input
-            label={textos.motivoLabel}
-            placeholder={textos.motivoPlaceholder}
-            value={values.motivo}
-            onChange={(event) => setField('motivo')(event.target.value)}
-          />
-        )}
+        <Input
+          label={textos.motivoLabel}
+          placeholder={textos.motivoPlaceholder}
+          value={values.motivo}
+          onChange={(event) => setField('motivo')(event.target.value)}
+        />
 
         {item && !fieldErrors.cantidad && (
           <p className={styles.resultado}>{textos.stockResultante(stockResultante)}</p>

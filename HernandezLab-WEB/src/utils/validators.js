@@ -39,12 +39,13 @@ export const validateRequerido = (value, label = 'Este campo') => {
   return null;
 };
 
-export const validateNumero = (value, label = 'Este campo', { min } = {}) => {
+export const validateNumero = (value, label = 'Este campo', { min, exclusiveMin } = {}) => {
   if (value === null || value === undefined || String(value).trim() === '') {
     return `${label} es obligatorio.`;
   }
   const numero = Number(value);
   if (Number.isNaN(numero)) return `${label} debe ser un número.`;
   if (min !== undefined && numero < min) return `${label} no puede ser menor a ${min}.`;
+  if (exclusiveMin !== undefined && numero <= exclusiveMin) return `${label} debe ser mayor a ${exclusiveMin}.`;
   return null;
 };

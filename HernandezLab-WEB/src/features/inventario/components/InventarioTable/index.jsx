@@ -1,6 +1,7 @@
-import { Pencil, Trash2, Boxes, PackagePlus, PackageMinus } from 'lucide-react';
+import { Pencil, Trash2, History, Boxes, PackageMinus } from 'lucide-react';
 import { TEXTS } from '../../../../constants/texts';
 import { getEstadoVencimiento } from '../../../../utils/vencimiento';
+import { pickLoteActual } from '../../hooks/useInventario';
 import TableA from 'anteriority-ui/screens/components/TableA/index';
 import Button from 'anteriority-ui/screens/components/Button/index';
 import Badge from 'anteriority-ui/screens/components/Badge/index';
@@ -36,7 +37,7 @@ const VencimientoBadge = ({ fechaVencimiento }) => {
   return <span>{fechaVencimiento}</span>;
 };
 
-export const InventarioTable = ({ items, isLoading, error, onRetry, onEdit, onDelete, onRegistrarCompra, onSacarStock }) => {
+export const InventarioTable = ({ items, isLoading, error, onRetry, onEdit, onDelete, onSacarStock, onViewHistorial }) => {
   const columns = [
     { header: TEXTS.inventario.table.codigo, accessor: 'codigo' },
     { header: TEXTS.inventario.table.nombre, accessor: 'nombre' },
@@ -61,30 +62,21 @@ export const InventarioTable = ({ items, isLoading, error, onRetry, onEdit, onDe
     },
     {
       header: TEXTS.inventario.table.fechaVencimiento,
-      render: (row) => <VencimientoBadge fechaVencimiento={row.fecha_vencimiento} />,
+      render: (row) => <VencimientoBadge fechaVencimiento={pickLoteActual(row.lotes_inventario)?.fecha_vencimiento} />,
     },
     {
       header: TEXTS.inventario.table.lote,
-      render: (row) => row.lote ?? '—',
+      render: (row) => pickLoteActual(row.lotes_inventario)?.numero_lote ?? '—',
     },
     {
       header: TEXTS.inventario.table.proveedor,
-      render: (row) => row.proveedores?.razon_social ?? TEXTS.inventario.sinProveedor,
+      render: (row) => pickLoteActual(row.lotes_inventario)?.proveedores?.razon_social ?? TEXTS.inventario.sinProveedor,
     },
     {
       header: TEXTS.inventario.movimientos.seccionTitle,
       align: 'right',
       render: (row) => (
         <div className={styles.stockActions}>
-          <Button
-            variant={Button.VARIANTS.GHOST}
-            size={Button.SIZES.SMALL}
-            circle
-            onClick={() => onRegistrarCompra(row)}
-            ToolTip={TEXTS.inventario.movimientos.agregarCompra}
-          >
-            <PackagePlus size={16} color="#088d4f" />
-          </Button>
           <Button
             variant={Button.VARIANTS.GHOST}
             size={Button.SIZES.SMALL}
@@ -102,6 +94,15 @@ export const InventarioTable = ({ items, isLoading, error, onRetry, onEdit, onDe
       align: 'right',
       render: (row) => (
         <div className={styles.actions}>
+          <Button
+            variant={Button.VARIANTS.GHOST}
+            size={Button.SIZES.SMALL}
+            circle
+            onClick={() => onViewHistorial(row)}
+            ToolTip={TEXTS.inventario.verHistorial}
+          >
+            <History size={16} />
+          </Button>
           <Button variant={Button.VARIANTS.GHOST} size={Button.SIZES.SMALL} circle onClick={() => onEdit(row)} ToolTip={TEXTS.inventario.editButton}>
             <Pencil size={16} />
           </Button>

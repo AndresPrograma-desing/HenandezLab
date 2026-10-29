@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TEXTS } from '../../constants/texts';
+import { useSucursalActiva } from '../../hooks/useSucursalActiva';
 import { useUsuarios } from './hooks/useUsuarios';
 import { useSucursales } from '../sucursales/hooks/useSucursales';
 import { UsuariosHeader } from './components/UsuariosHeader';
@@ -13,7 +14,8 @@ const mapErrorToMessage = (error) => {
 };
 
 export const UsuariosPage = () => {
-  const { usuarios, isLoading, error, refetch, createUsuario, updateUsuario, deleteUsuario } = useUsuarios();
+  const { idSucursalActiva } = useSucursalActiva();
+  const { usuarios, isLoading, error, refetch, createUsuario, updateUsuario, deleteUsuario } = useUsuarios(idSucursalActiva);
   const { sucursales } = useSucursales();
 
   const [editingUsuario, setEditingUsuario] = useState(null);
