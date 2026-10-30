@@ -1,2 +1,5 @@
 *.sql
 !SQL/**/*.sql
+
+# Supabase CLI local link metadata (project ref, pooler URL, etc.) — not secrets to commit.
+**/supabase/.temp/

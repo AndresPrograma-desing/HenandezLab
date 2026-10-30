@@ -37,15 +37,16 @@ export const useUsuarios = (idSucursal) => {
   }, [fetchUsuarios]);
 
   const createUsuario = async (values) => {
-    const { data, error: insertError } = await supabase
-      .from('empleados')
-      .insert(values)
-      .select('*, sucursales(nombre)')
-      .single();
+    const { data, error: invokeError } = await supabase.functions.invoke('crear-empleado', { body: values });
 
-    if (insertError) throw insertError;
-    setUsuarios((prev) => sortByNombre([...prev, data]));
-    return data;
+    if (invokeError) {
+      const serverMessage = await invokeError.context?.json?.().catch(() => null);
+      throw new Error(serverMessage?.error || invokeError.message);
+    }
+    if (data?.error) throw new Error(data.error);
+
+    await fetchUsuarios();
+    return data.empleado;
   };
 
   const updateUsuario = async (cedula, changes) => {
@@ -62,8 +63,14 @@ export const useUsuarios = (idSucursal) => {
   };
 
   const deleteUsuario = async (cedula) => {
-    const { error: deleteError } = await supabase.from('empleados').delete().eq('cedula', cedula);
-    if (deleteError) throw deleteError;
+    const { data, error: invokeError } = await supabase.functions.invoke('eliminar-empleado', { body: { cedula } });
+
+    if (invokeError) {
+      const serverMessage = await invokeError.context?.json?.().catch(() => null);
+      throw new Error(serverMessage?.error || invokeError.message);
+    }
+    if (data?.error) throw new Error(data.error);
+
     setUsuarios((prev) => prev.filter((u) => u.cedula !== cedula));
   };
 

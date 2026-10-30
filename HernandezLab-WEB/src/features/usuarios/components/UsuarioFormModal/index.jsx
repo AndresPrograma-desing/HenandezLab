@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { TEXTS } from '../../../../constants/texts';
-import { validateCedula, validateNombre, validateRequerido } from '../../../../utils/validators';
+import { validateCedula, validateNombre, validateRequerido, validateEmail, validatePassword } from '../../../../utils/validators';
 import { useDuplicateCheck } from '../../../../hooks/useDuplicateCheck';
 import DrawPanel from 'anteriority-ui/screens/components/DrawPanel/index';
 import Input from 'anteriority-ui/screens/components/Input/index';
 import Selector from 'anteriority-ui/screens/components/Material-UI/Components/Selector/index';
 import Switch from 'anteriority-ui/screens/components/Swich/index';
+import Button from 'anteriority-ui/screens/components/Button/index';
 import styles from './index.module.css';
 
 const emptyValues = {
@@ -16,6 +17,8 @@ const emptyValues = {
   rol: '',
   id_sucursal: '',
   estado_activo: true,
+  email: '',
+  password: '',
 };
 
 const rolOptions = [
@@ -24,6 +27,8 @@ const rolOptions = [
 ];
 
 const cargoOptions = Object.entries(TEXTS.usuarios.cargos).map(([value, label]) => ({ value, label }));
+
+const generarPasswordAleatoria = () => Math.random().toString(36).slice(-10) + 'A1';
 
 export const UsuarioFormModal = ({
   open,
@@ -52,6 +57,8 @@ export const UsuarioFormModal = ({
             rol: usuario.rol,
             id_sucursal: usuario.id_sucursal,
             estado_activo: usuario.estado_activo,
+            email: '',
+            password: '',
           }
         : emptyValues
     );
@@ -84,6 +91,11 @@ export const UsuarioFormModal = ({
       id_sucursal: validateRequerido(values.id_sucursal, TEXTS.usuarios.form.sucursalLabel),
     };
 
+    if (!isEdit) {
+      errors.email = validateEmail(values.email);
+      errors.password = validatePassword(values.password);
+    }
+
     if (!isEdit && !errors.cedula) {
       const existe = await checkDuplicado('empleados', { cedula: values.cedula.trim() });
       if (existe) errors.cedula = TEXTS.usuarios.avisos.cedulaDuplicada;
@@ -93,7 +105,8 @@ export const UsuarioFormModal = ({
     setFieldErrors(errors);
     if (hasErrors) return;
 
-    onSubmit(values);
+    const { email: _email, password: _password, ...empleadoValues } = values;
+    onSubmit(isEdit ? empleadoValues : values);
   };
 
   return (
@@ -166,7 +179,32 @@ export const UsuarioFormModal = ({
           <Switch value={values.estado_activo} onChange={setField('estado_activo')} />
         </div>
 
-        <p className={styles.note}>{TEXTS.usuarios.form.loginNote}</p>
+        {!isEdit && (
+          <div className={styles.accesoSection}>
+            <h4>{TEXTS.usuarios.form.accesoSectionTitle}</h4>
+            <Input
+              label={TEXTS.usuarios.form.emailLabel}
+              type="email"
+              value={values.email}
+              onChange={(event) => setField('email')(event.target.value)}
+              error={fieldErrors.email}
+              required
+            />
+            <div className={styles.passwordRow}>
+              <Input
+                label={TEXTS.usuarios.form.passwordLabel}
+                value={values.password}
+                onChange={(event) => setField('password')(event.target.value)}
+                error={fieldErrors.password}
+                helperText={!fieldErrors.password ? TEXTS.usuarios.form.passwordHelper : undefined}
+                required
+              />
+              <Button type="button" variant={Button.VARIANTS.OUTLINE} onClick={() => setField('password')(generarPasswordAleatoria())}>
+                {TEXTS.usuarios.form.generarPassword}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {submitError && <p className={styles.error}>{submitError}</p>}
       </form>

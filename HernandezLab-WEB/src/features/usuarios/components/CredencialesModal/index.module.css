@@ -1,0 +1,13 @@
+.message {
+  margin: 0;
+  white-space: pre-line;
+  color: #374151;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}

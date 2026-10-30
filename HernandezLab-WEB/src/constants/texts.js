@@ -85,22 +85,29 @@ export const TEXTS = {
       rolLabel: 'Rol',
       sucursalLabel: 'Sucursal',
       estadoLabel: 'Usuario activo',
-      loginNote:
-        'Este formulario crea el registro del empleado. Para que pueda iniciar sesión, crea su cuenta en Authentication → Users del Dashboard de Supabase.',
+      accesoSectionTitle: 'Acceso al sistema',
+      emailLabel: 'Correo de acceso',
+      passwordLabel: 'Contraseña inicial',
+      passwordHelper: 'El empleado podrá cambiarla luego de iniciar sesión.',
+      generarPassword: 'Generar',
+      credencialesNota: (email, password) =>
+        `Cuenta creada. Entrégale al empleado estas credenciales para que inicie sesión:\nCorreo: ${email}\nContraseña: ${password}`,
       submitCreate: 'Crear',
       submitEdit: 'Guardar cambios',
       cancel: 'Cancelar',
+      cerrar: 'Cerrar',
     },
     confirmDelete: {
       title: 'Eliminar usuario',
       message: (nombreCompleto) =>
-        `¿Seguro que deseas eliminar a ${nombreCompleto}? Esta acción no se puede deshacer.`,
+        `¿Seguro que deseas eliminar a ${nombreCompleto}? Esta acción también elimina su acceso al sistema y no se puede deshacer.`,
       confirm: 'Eliminar',
       cancel: 'Cancelar',
     },
     errors: {
       generico: 'Ocurrió un error al guardar. Intenta de nuevo.',
       cedulaDuplicada: 'Ya existe un empleado con esa cédula.',
+      emailDuplicado: 'Ya existe una cuenta registrada con ese correo. Usa otro correo de acceso.',
     },
     avisos: {
       cedulaDuplicada: 'Ya existe un empleado registrado con esta cédula.',

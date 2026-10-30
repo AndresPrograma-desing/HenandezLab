@@ -6,10 +6,14 @@ import { useSucursales } from '../sucursales/hooks/useSucursales';
 import { UsuariosHeader } from './components/UsuariosHeader';
 import { UsuariosTable } from './components/UsuariosTable';
 import { UsuarioFormModal } from './components/UsuarioFormModal';
+import { CredencialesModal } from './components/CredencialesModal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
 
 const mapErrorToMessage = (error) => {
   if (error?.code === '23505') return TEXTS.usuarios.errors.cedulaDuplicada;
+  if (error?.message?.includes('already been registered')) return TEXTS.usuarios.errors.emailDuplicado;
+  if (error?.message === 'Ya existe un empleado con esa cédula') return TEXTS.usuarios.errors.cedulaDuplicada;
+  if (error?.message) return error.message;
   return TEXTS.usuarios.errors.generico;
 };
 
@@ -26,6 +30,8 @@ export const UsuariosPage = () => {
   const [deletingUsuario, setDeletingUsuario] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
+
+  const [credenciales, setCredenciales] = useState(null);
 
   const openCreate = () => {
     setEditingUsuario(null);
@@ -50,6 +56,7 @@ export const UsuariosPage = () => {
         await updateUsuario(editingUsuario.cedula, changes);
       } else {
         await createUsuario(values);
+        setCredenciales({ email: values.email, password: values.password });
       }
       closeForm();
     } catch (err) {
@@ -107,6 +114,8 @@ export const UsuariosPage = () => {
         onConfirm={handleDelete}
         onCancel={closeDelete}
       />
+
+      <CredencialesModal credenciales={credenciales} onClose={() => setCredenciales(null)} />
     </div>
   );
 };
