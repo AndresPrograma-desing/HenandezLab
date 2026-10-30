@@ -3,14 +3,12 @@ import Frame from 'anteriority-ui/screens/components/Frame/index';
 import Button from 'anteriority-ui/screens/components/Button/index';
 import styles from './index.module.css';
 
-export const CredencialesModal = ({ credenciales, onClose }) => {
-  if (!credenciales) return null;
+export const CredencialesModal = ({ info, onClose }) => {
+  if (!info) return null;
 
   return (
-    <Frame title={TEXTS.usuarios.form.accesoSectionTitle} isModal onClose={onClose}>
-      <p className={styles.message}>
-        {TEXTS.usuarios.form.credencialesNota(credenciales.email, credenciales.password)}
-      </p>
+    <Frame title={info.title} isModal onClose={onClose}>
+      <p className={styles.message}>{info.message}</p>
       <div className={styles.actions}>
         <Button variant={Button.VARIANTS.PRIMARY} onClick={onClose}>
           {TEXTS.usuarios.form.cerrar}

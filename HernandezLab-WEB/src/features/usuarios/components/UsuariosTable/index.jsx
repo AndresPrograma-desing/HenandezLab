@@ -1,11 +1,11 @@
-import { Pencil, Trash2, Users } from 'lucide-react';
+import { Pencil, Trash2, KeyRound, Users } from 'lucide-react';
 import { TEXTS } from '../../../../constants/texts';
 import TableA from 'anteriority-ui/screens/components/TableA/index';
 import Button from 'anteriority-ui/screens/components/Button/index';
 import Badge from 'anteriority-ui/screens/components/Badge/index';
 import styles from './index.module.css';
 
-export const UsuariosTable = ({ usuarios, isLoading, error, onRetry, onEdit, onDelete }) => {
+export const UsuariosTable = ({ usuarios, isLoading, error, onRetry, onEdit, onDelete, onResetPassword }) => {
   const columns = [
     { header: TEXTS.usuarios.table.cedula, accessor: 'cedula' },
     { header: TEXTS.usuarios.table.nombre, accessor: 'nombre' },
@@ -37,6 +37,15 @@ export const UsuariosTable = ({ usuarios, isLoading, error, onRetry, onEdit, onD
       align: 'right',
       render: (row) => (
         <div className={styles.actions}>
+          <Button
+            variant={Button.VARIANTS.GHOST}
+            size={Button.SIZES.SMALL}
+            circle
+            onClick={() => onResetPassword(row)}
+            ToolTip={TEXTS.usuarios.resetPasswordButton}
+          >
+            <KeyRound size={16} />
+          </Button>
           <Button
             variant={Button.VARIANTS.GHOST}
             size={Button.SIZES.SMALL}

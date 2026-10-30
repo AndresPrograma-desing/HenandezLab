@@ -56,6 +56,7 @@ export const TEXTS = {
     createButton: 'Crear usuario',
     editButton: 'Editar',
     deleteButton: 'Eliminar',
+    resetPasswordButton: 'Restablecer contraseña',
     empty: 'Aún no hay usuarios registrados.',
     cargos: {
       administrador: 'Administrador',
@@ -103,6 +104,12 @@ export const TEXTS = {
         `¿Seguro que deseas eliminar a ${nombreCompleto}? Esta acción también elimina su acceso al sistema y no se puede deshacer.`,
       confirm: 'Eliminar',
       cancel: 'Cancelar',
+    },
+    resetPassword: {
+      title: (nombreCompleto) => `Restablecer contraseña — ${nombreCompleto}`,
+      submit: 'Restablecer',
+      credencialesNota: (password) =>
+        `Contraseña restablecida. Entrégale al empleado su nueva contraseña:\n${password}`,
     },
     errors: {
       generico: 'Ocurrió un error al guardar. Intenta de nuevo.',

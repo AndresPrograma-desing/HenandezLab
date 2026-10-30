@@ -7,6 +7,7 @@ import { UsuariosHeader } from './components/UsuariosHeader';
 import { UsuariosTable } from './components/UsuariosTable';
 import { UsuarioFormModal } from './components/UsuarioFormModal';
 import { CredencialesModal } from './components/CredencialesModal';
+import { ResetPasswordModal } from './components/ResetPasswordModal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
 
 const mapErrorToMessage = (error) => {
@@ -19,7 +20,8 @@ const mapErrorToMessage = (error) => {
 
 export const UsuariosPage = () => {
   const { idSucursalActiva } = useSucursalActiva();
-  const { usuarios, isLoading, error, refetch, createUsuario, updateUsuario, deleteUsuario } = useUsuarios(idSucursalActiva);
+  const { usuarios, isLoading, error, refetch, createUsuario, updateUsuario, deleteUsuario, resetearPassword } =
+    useUsuarios(idSucursalActiva);
   const { sucursales } = useSucursales();
 
   const [editingUsuario, setEditingUsuario] = useState(null);
@@ -31,7 +33,11 @@ export const UsuariosPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
 
-  const [credenciales, setCredenciales] = useState(null);
+  const [credencialesInfo, setCredencialesInfo] = useState(null);
+
+  const [resettingUsuario, setResettingUsuario] = useState(null);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetError, setResetError] = useState(null);
 
   const openCreate = () => {
     setEditingUsuario(null);
@@ -56,13 +62,35 @@ export const UsuariosPage = () => {
         await updateUsuario(editingUsuario.cedula, changes);
       } else {
         await createUsuario(values);
-        setCredenciales({ email: values.email, password: values.password });
+        setCredencialesInfo({
+          title: TEXTS.usuarios.form.accesoSectionTitle,
+          message: TEXTS.usuarios.form.credencialesNota(values.email, values.password),
+        });
       }
       closeForm();
     } catch (err) {
       setSubmitError(mapErrorToMessage(err));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const closeReset = () => setResettingUsuario(null);
+
+  const handleResetPassword = async (password) => {
+    setIsResetting(true);
+    setResetError(null);
+    try {
+      await resetearPassword(resettingUsuario.cedula, password);
+      setCredencialesInfo({
+        title: TEXTS.usuarios.resetPassword.title(`${resettingUsuario.nombre} ${resettingUsuario.apellido}`),
+        message: TEXTS.usuarios.resetPassword.credencialesNota(password),
+      });
+      closeReset();
+    } catch (err) {
+      setResetError(mapErrorToMessage(err));
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -91,6 +119,7 @@ export const UsuariosPage = () => {
         onRetry={refetch}
         onEdit={openEdit}
         onDelete={setDeletingUsuario}
+        onResetPassword={setResettingUsuario}
       />
 
       <UsuarioFormModal
@@ -115,7 +144,15 @@ export const UsuariosPage = () => {
         onCancel={closeDelete}
       />
 
-      <CredencialesModal credenciales={credenciales} onClose={() => setCredenciales(null)} />
+      <ResetPasswordModal
+        usuario={resettingUsuario}
+        onSubmit={handleResetPassword}
+        onCancel={closeReset}
+        isSubmitting={isResetting}
+        submitError={resetError}
+      />
+
+      <CredencialesModal info={credencialesInfo} onClose={() => setCredencialesInfo(null)} />
     </div>
   );
 };

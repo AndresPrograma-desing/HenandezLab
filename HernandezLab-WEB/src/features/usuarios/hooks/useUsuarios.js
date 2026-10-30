@@ -4,6 +4,18 @@ import { supabase } from '../../../lib/supabaseClient';
 const sortByNombre = (list) =>
   [...list].sort((a, b) => `${a.nombre} ${a.apellido}`.localeCompare(`${b.nombre} ${b.apellido}`));
 
+const invokeFunction = async (name, body) => {
+  const { data, error: invokeError } = await supabase.functions.invoke(name, { body });
+
+  if (invokeError) {
+    const serverMessage = await invokeError.context?.json?.().catch(() => null);
+    throw new Error(serverMessage?.error || invokeError.message);
+  }
+  if (data?.error) throw new Error(data.error);
+
+  return data;
+};
+
 export const useUsuarios = (idSucursal) => {
   const [usuarios, setUsuarios] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,14 +49,7 @@ export const useUsuarios = (idSucursal) => {
   }, [fetchUsuarios]);
 
   const createUsuario = async (values) => {
-    const { data, error: invokeError } = await supabase.functions.invoke('crear-empleado', { body: values });
-
-    if (invokeError) {
-      const serverMessage = await invokeError.context?.json?.().catch(() => null);
-      throw new Error(serverMessage?.error || invokeError.message);
-    }
-    if (data?.error) throw new Error(data.error);
-
+    const data = await invokeFunction('crear-empleado', values);
     await fetchUsuarios();
     return data.empleado;
   };
@@ -63,15 +68,12 @@ export const useUsuarios = (idSucursal) => {
   };
 
   const deleteUsuario = async (cedula) => {
-    const { data, error: invokeError } = await supabase.functions.invoke('eliminar-empleado', { body: { cedula } });
-
-    if (invokeError) {
-      const serverMessage = await invokeError.context?.json?.().catch(() => null);
-      throw new Error(serverMessage?.error || invokeError.message);
-    }
-    if (data?.error) throw new Error(data.error);
-
+    await invokeFunction('eliminar-empleado', { cedula });
     setUsuarios((prev) => prev.filter((u) => u.cedula !== cedula));
+  };
+
+  const resetearPassword = async (cedula, password) => {
+    await invokeFunction('resetear-password-empleado', { cedula, password });
   };
 
   return {
@@ -82,5 +84,6 @@ export const useUsuarios = (idSucursal) => {
     createUsuario,
     updateUsuario,
     deleteUsuario,
+    resetearPassword,
   };
 };
