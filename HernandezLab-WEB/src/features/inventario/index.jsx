@@ -9,6 +9,7 @@ import { InventarioFormModal } from './components/InventarioFormModal';
 import { StockMovimientoModal } from './components/StockMovimientoModal';
 import { HistorialLotesModal } from './components/HistorialLotesModal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
+import { exportToPdf, formatFecha } from '../../utils/exportPdf';
 
 const mapErrorToMessage = (error) => {
   if (error?.code === '23505') return TEXTS.inventario.errors.codigoDuplicado;
@@ -41,6 +42,23 @@ export const InventarioPage = () => {
     () => items.filter((item) => item.categoria === categoriaActiva),
     [items, categoriaActiva]
   );
+
+  const handleExport = () =>
+    exportToPdf({
+      fileName: `inventario-${categoriaActiva}`,
+      title: TEXTS.inventario.title,
+      columns: [
+        { header: TEXTS.inventario.table.codigo, key: 'codigo' },
+        { header: TEXTS.inventario.table.nombre, key: 'nombre' },
+        { header: TEXTS.inventario.table.stockActual, key: 'stock_actual' },
+        { header: TEXTS.inventario.table.stockMinimo, key: 'stock_minimo' },
+        { header: TEXTS.inventario.table.fechaVencimiento, key: 'vencimiento' },
+      ],
+      rows: itemsFiltrados.map((item) => ({
+        ...item,
+        vencimiento: formatFecha(item.fecha_vencimiento),
+      })),
+    });
 
   const openCreate = () => {
     setEditingItem(null);
@@ -105,7 +123,7 @@ export const InventarioPage = () => {
 
   return (
     <div>
-      <InventarioHeader total={itemsFiltrados.length} onCreate={openCreate} />
+      <InventarioHeader total={itemsFiltrados.length} onCreate={openCreate} onExport={handleExport} />
       <CategoriaTabs value={categoriaActiva} onChange={setCategoriaActiva} />
       <InventarioTable
         items={itemsFiltrados}

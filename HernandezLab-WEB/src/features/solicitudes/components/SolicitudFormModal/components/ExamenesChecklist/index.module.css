@@ -21,12 +21,18 @@
 }
 
 /* El componente Checks de anteriority-ui trae por defecto un color de texto
-   (#e5e7eb) pensado para fondos oscuros, casi ilegible sobre blanco. Como
-   es un CSS module de la librería no podemos sobreescribir su clase
-   directamente, así que apuntamos a la clase global que sí expone
-   (MuiButtonBase-root) para forzar un color legible en ambos estados. */
-.list :global(.MuiButtonBase-root) > span:last-child {
+   (#e5e7eb) pensado para fondos oscuros, casi ilegible sobre blanco, y tacha
+   el texto al marcarlo. Como es un CSS module de la librería no podemos
+   sobreescribir su clase directamente, así que apuntamos a la clase global
+   que sí expone (MuiButtonBase-root) y al span de la etiqueta (el último
+   span es el ripple de MUI, no la etiqueta). */
+.list :global(.MuiButtonBase-root) span[class*='label'] {
   color: #1f2937 !important;
+  text-decoration: none !important;
+}
+
+.list :global(.MuiCheckbox-root):not(:global(.Mui-checked)) {
+  color: #4b5563;
 }
 
 .preview {

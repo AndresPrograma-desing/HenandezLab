@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { TEXTS } from '../constants/texts';
 
@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [empleado, setEmpleado] = useState(null);
   const [empleadoError, setEmpleadoError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const sessionUserIdRef = useRef(null);
 
   const fetchEmpleado = useCallback(async (authUserId) => {
     if (!authUserId) {
@@ -39,17 +40,22 @@ export const AuthProvider = ({ children }) => {
 
     supabase.auth.getSession().then(async ({ data }) => {
       if (!active) return;
+      sessionUserIdRef.current = data.session?.user?.id ?? null;
       setSession(data.session);
       await fetchEmpleado(data.session?.user?.id);
       if (active) setIsLoading(false);
     });
 
+    // Los eventos posteriores a la carga inicial (p. ej. TOKEN_REFRESHED al
+    // volver a la pestaña) no deben desmontar la app: no se activa isLoading
+    // y, si es el mismo usuario, no se vuelve a consultar el empleado.
     const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
       if (!active) return;
-      setIsLoading(true);
+      const mismoUsuario = nextSession?.user?.id === sessionUserIdRef.current;
+      sessionUserIdRef.current = nextSession?.user?.id ?? null;
       setSession(nextSession);
+      if (mismoUsuario) return;
       await fetchEmpleado(nextSession?.user?.id);
-      if (active) setIsLoading(false);
     });
 
     return () => {

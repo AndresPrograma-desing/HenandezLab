@@ -41,6 +41,7 @@ export const TEXTS = {
   },
   comun: {
     proximamente: 'Este módulo se termina de construir en la siguiente fase.',
+    exportarPdf: 'Exportar a PDF',
     activo: 'Activo',
     inactivo: 'Inactivo',
     acciones: 'Acciones',
@@ -348,6 +349,14 @@ export const TEXTS = {
   solicitudes: {
     title: 'Solicitudes',
     createButton: 'Nueva solicitud',
+    deleteButton: 'Eliminar solicitud',
+    confirmDelete: {
+      title: 'Eliminar solicitud',
+      message: (paciente) =>
+        `¿Seguro que deseas eliminar la solicitud de "${paciente}"? Se eliminarán también sus exámenes y esta acción no se puede deshacer.`,
+      confirm: 'Eliminar',
+      cancel: 'Cancelar',
+    },
     empty: 'Aún no hay solicitudes registradas.',
     emptyFiltrado: 'Ninguna solicitud coincide con la búsqueda.',
     busqueda: {
@@ -387,6 +396,7 @@ export const TEXTS = {
       generico: 'Ocurrió un error al registrar la solicitud. Intenta de nuevo.',
       stockInsuficiente: 'No hay stock suficiente para completar esta solicitud.',
       seleccionaExamen: 'Selecciona al menos un examen.',
+      eliminar: 'No se pudo eliminar la solicitud. Intenta de nuevo.',
     },
   },
   dashboard: {

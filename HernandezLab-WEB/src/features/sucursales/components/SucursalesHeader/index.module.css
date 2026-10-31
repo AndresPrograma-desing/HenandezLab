@@ -5,6 +5,12 @@
   margin-bottom: 1.5rem;
 }
 
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .titleRow {
   display: flex;
   align-items: center;

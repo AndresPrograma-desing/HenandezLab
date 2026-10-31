@@ -34,6 +34,7 @@ export const UsuarioFormModal = ({
   open,
   usuario,
   sucursales,
+  defaultSucursalId,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -60,9 +61,9 @@ export const UsuarioFormModal = ({
             email: '',
             password: '',
           }
-        : emptyValues
+        : { ...emptyValues, id_sucursal: defaultSucursalId ?? '' }
     );
-  }, [open, usuario]);
+  }, [open, usuario, defaultSucursalId]);
 
   const sucursalOptions = sucursales.map((s) => ({ value: s.id_sucursal, label: s.nombre }));
 

@@ -3,6 +3,7 @@ import { TEXTS } from '../../../../constants/texts';
 import Badge from 'anteriority-ui/screens/components/Badge/index';
 import Button from 'anteriority-ui/screens/components/Button/index';
 import Input from 'anteriority-ui/screens/components/Input/index';
+import { ExportPdfButton } from '../../../../components/common/ExportPdfButton';
 import styles from './index.module.css';
 
 const ESTADO_OPTIONS = [
@@ -12,16 +13,27 @@ const ESTADO_OPTIONS = [
   { value: 'entregado', label: TEXTS.solicitudes.estados.entregado },
 ];
 
-export const SolicitudesHeader = ({ total, onCreate, search, onSearchChange, estadoFiltro, onEstadoFiltroChange }) => (
+export const SolicitudesHeader = ({
+  total,
+  onCreate,
+  onExport,
+  search,
+  onSearchChange,
+  estadoFiltro,
+  onEstadoFiltroChange,
+}) => (
   <div>
     <div className={styles.header}>
       <div className={styles.titleRow}>
         <h2>{TEXTS.solicitudes.title}</h2>
         <Badge label={TEXTS.comun.total} value={total} />
       </div>
-      <Button variant={Button.VARIANTS.PRIMARY} onClick={onCreate} icon={Plus}>
-        {TEXTS.solicitudes.createButton}
-      </Button>
+      <div className={styles.acciones}>
+        <ExportPdfButton onExport={onExport} disabled={total === 0} />
+        <Button variant={Button.VARIANTS.PRIMARY} onClick={onCreate} icon={Plus}>
+          {TEXTS.solicitudes.createButton}
+        </Button>
+      </div>
     </div>
 
     <div className={styles.filtros}>

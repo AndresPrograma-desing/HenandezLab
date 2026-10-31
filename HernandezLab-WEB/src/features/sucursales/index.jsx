@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TEXTS } from '../../constants/texts';
 import { useSucursales } from './hooks/useSucursales';
+import { exportToPdf } from '../../utils/exportPdf';
 import { SucursalesHeader } from './components/SucursalesHeader';
 import { SucursalesTable } from './components/SucursalesTable';
 import { SucursalFormModal } from './components/SucursalFormModal';
@@ -10,6 +11,24 @@ const mapErrorToMessage = () => TEXTS.sucursales.errors.generico;
 
 export const SucursalesPage = () => {
   const { sucursales, isLoading, error, refetch, createSucursal, updateSucursal, deleteSucursal } = useSucursales();
+
+  const handleExport = () =>
+    exportToPdf({
+      fileName: 'sucursales',
+      title: TEXTS.sucursales.title,
+      columns: [
+        { header: TEXTS.sucursales.table.nombre, key: 'nombre' },
+        { header: TEXTS.sucursales.table.direccion, key: 'direccion' },
+        { header: TEXTS.sucursales.table.telefono, key: 'telefono' },
+        { header: TEXTS.sucursales.table.estado, key: 'estado' },
+      ],
+      rows: sucursales.map((sucursal) => ({
+        nombre: sucursal.nombre,
+        direccion: sucursal.direccion ?? '',
+        telefono: sucursal.telefono ?? '',
+        estado: sucursal.activo ? TEXTS.comun.activo : TEXTS.comun.inactivo,
+      })),
+    });
 
   const [editingSucursal, setEditingSucursal] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -68,7 +87,7 @@ export const SucursalesPage = () => {
 
   return (
     <div>
-      <SucursalesHeader total={sucursales.length} onCreate={openCreate} />
+      <SucursalesHeader total={sucursales.length} onCreate={openCreate} onExport={handleExport} />
       <SucursalesTable
         sucursales={sucursales}
         isLoading={isLoading}

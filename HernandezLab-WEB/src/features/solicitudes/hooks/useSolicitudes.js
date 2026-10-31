@@ -47,11 +47,26 @@ export const useSolicitudes = (idSucursal) => {
     return data;
   };
 
+  const deleteSolicitud = async (idSolicitud) => {
+    const { data, error: deleteError } = await supabase
+      .from('solicitudes')
+      .delete()
+      .eq('id_solicitud', idSolicitud)
+      .select('id_solicitud');
+
+    if (deleteError) throw deleteError;
+    // RLS no lanza error cuando bloquea un delete: simplemente no borra filas.
+    if (!data?.length) throw new Error('No se eliminó ninguna fila');
+
+    setSolicitudes((prev) => prev.filter((s) => s.id_solicitud !== idSolicitud));
+  };
+
   return {
     solicitudes,
     isLoading,
     error,
     refetch: fetchSolicitudes,
     createSolicitud,
+    deleteSolicitud,
   };
 };

@@ -9,6 +9,7 @@ import { UsuarioFormModal } from './components/UsuarioFormModal';
 import { CredencialesModal } from './components/CredencialesModal';
 import { ResetPasswordModal } from './components/ResetPasswordModal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
+import { exportToPdf, formatFecha } from '../../utils/exportPdf';
 
 const mapErrorToMessage = (error) => {
   if (error?.code === '23505') return TEXTS.usuarios.errors.cedulaDuplicada;
@@ -38,6 +39,30 @@ export const UsuariosPage = () => {
   const [resettingUsuario, setResettingUsuario] = useState(null);
   const [isResetting, setIsResetting] = useState(false);
   const [resetError, setResetError] = useState(null);
+
+  const handleExport = () =>
+    exportToPdf({
+      fileName: 'usuarios',
+      title: TEXTS.usuarios.title,
+      columns: [
+        { header: TEXTS.usuarios.table.cedula, key: 'cedula' },
+        { header: TEXTS.usuarios.table.nombre, key: 'nombre' },
+        { header: TEXTS.usuarios.table.apellido, key: 'apellido' },
+        { header: TEXTS.usuarios.table.cargo, key: 'cargo' },
+        { header: TEXTS.usuarios.table.rol, key: 'rol' },
+        { header: TEXTS.usuarios.table.sucursal, key: 'sucursal' },
+        { header: TEXTS.usuarios.table.estado, key: 'estado' },
+      ],
+      rows: usuarios.map((usuario) => ({
+        cedula: usuario.cedula,
+        nombre: usuario.nombre,
+        apellido: usuario.apellido,
+        cargo: TEXTS.usuarios.cargos[usuario.cargo] ?? usuario.cargo,
+        rol: TEXTS.roles[usuario.rol] ?? usuario.rol,
+        sucursal: usuario.sucursales?.nombre ?? '',
+        estado: usuario.estado_activo ? TEXTS.comun.activo : TEXTS.comun.inactivo,
+      })),
+    });
 
   const openCreate = () => {
     setEditingUsuario(null);
@@ -111,7 +136,7 @@ export const UsuariosPage = () => {
 
   return (
     <div>
-      <UsuariosHeader total={usuarios.length} onCreate={openCreate} />
+      <UsuariosHeader total={usuarios.length} onCreate={openCreate} onExport={handleExport} />
       <UsuariosTable
         usuarios={usuarios}
         isLoading={isLoading}
@@ -126,6 +151,7 @@ export const UsuariosPage = () => {
         open={isFormOpen}
         usuario={editingUsuario}
         sucursales={sucursales}
+        defaultSucursalId={idSucursalActiva}
         onSubmit={handleSubmit}
         onCancel={closeForm}
         isSubmitting={isSubmitting}

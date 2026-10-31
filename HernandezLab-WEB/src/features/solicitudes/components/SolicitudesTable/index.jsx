@@ -1,7 +1,9 @@
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, Trash2 } from 'lucide-react';
 import { TEXTS } from '../../../../constants/texts';
 import TableA from 'anteriority-ui/screens/components/TableA/index';
+import Button from 'anteriority-ui/screens/components/Button/index';
 import Badge from 'anteriority-ui/screens/components/Badge/index';
+import styles from './index.module.css';
 
 const ESTADO_COLORS = {
   pendiente: '#d97706',
@@ -9,7 +11,7 @@ const ESTADO_COLORS = {
   entregado: '#088d4f',
 };
 
-export const SolicitudesTable = ({ solicitudes, isLoading, error, onRetry, emptyMessage }) => {
+export const SolicitudesTable = ({ solicitudes, isLoading, error, onRetry, emptyMessage, onDelete }) => {
   const columns = [
     {
       header: TEXTS.solicitudes.table.paciente,
@@ -36,6 +38,27 @@ export const SolicitudesTable = ({ solicitudes, isLoading, error, onRetry, empty
       align: 'right',
       render: (row) => `$${Number(row.total_pagar).toFixed(2)}`,
     },
+    ...(onDelete
+      ? [
+          {
+            header: TEXTS.comun.acciones,
+            align: 'right',
+            render: (row) => (
+              <div className={styles.actions}>
+                <Button
+                  variant={Button.VARIANTS.GHOST}
+                  size={Button.SIZES.SMALL}
+                  circle
+                  onClick={() => onDelete(row)}
+                  ToolTip={TEXTS.solicitudes.deleteButton}
+                >
+                  <Trash2 size={16} color="#dc2626" />
+                </Button>
+              </div>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (

@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useSucursalActiva } from '../../hooks/useSucursalActiva';
 import { useCompras } from './hooks/useCompras';
 import { useProveedores } from '../proveedores/hooks/useProveedores';
+import { exportToPdf, formatFecha } from '../../utils/exportPdf';
 import { useInventario } from '../inventario/hooks/useInventario';
 import { ComprasHeader } from './components/ComprasHeader';
 import { ComprasTable } from './components/ComprasTable';
@@ -17,6 +18,28 @@ export const ComprasPage = () => {
   const { compras, isLoading, error, refetch, createCompra } = useCompras(idSucursalActiva);
   const { proveedores } = useProveedores();
   const { items: inventarioItems } = useInventario(idSucursalActiva);
+
+  const handleExport = () =>
+    exportToPdf({
+      fileName: 'compras',
+      title: TEXTS.compras.title,
+      columns: [
+        { header: TEXTS.compras.table.fecha, key: 'fecha' },
+        { header: TEXTS.compras.table.proveedor, key: 'proveedor' },
+        { header: TEXTS.compras.table.numeroFactura, key: 'factura' },
+        { header: TEXTS.compras.table.items, key: 'items' },
+        { header: TEXTS.compras.table.montoTotal, key: 'monto' },
+        { header: TEXTS.compras.table.empleado, key: 'empleado' },
+      ],
+      rows: compras.map((compra) => ({
+        fecha: formatFecha(compra.fecha_compra),
+        proveedor: compra.proveedores?.razon_social ?? '',
+        factura: compra.numero_factura ?? TEXTS.compras.sinFactura,
+        items: compra.detalle_compra?.length ?? 0,
+        monto: Number(compra.monto_total),
+        empleado: compra.empleados ? `${compra.empleados.nombre} ${compra.empleados.apellido}` : '',
+      })),
+    });
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,7 +67,7 @@ export const ComprasPage = () => {
 
   return (
     <div>
-      <ComprasHeader total={compras.length} onCreate={openCreate} />
+      <ComprasHeader total={compras.length} onCreate={openCreate} onExport={handleExport} />
       <ComprasTable compras={compras} isLoading={isLoading} error={error} onRetry={refetch} />
 
       <CompraFormModal

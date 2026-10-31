@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TEXTS } from '../../constants/texts';
 import { useProveedores } from './hooks/useProveedores';
+import { exportToPdf } from '../../utils/exportPdf';
 import { ProveedoresHeader } from './components/ProveedoresHeader';
 import { ProveedoresTable } from './components/ProveedoresTable';
 import { ProveedorFormModal } from './components/ProveedorFormModal';
@@ -13,6 +14,24 @@ const mapErrorToMessage = (error) => {
 
 export const ProveedoresPage = () => {
   const { proveedores, isLoading, error, refetch, createProveedor, updateProveedor, deleteProveedor } = useProveedores();
+
+  const handleExport = () =>
+    exportToPdf({
+      fileName: 'proveedores',
+      title: TEXTS.proveedores.title,
+      columns: [
+        { header: TEXTS.proveedores.table.rif, key: 'rif' },
+        { header: TEXTS.proveedores.table.razonSocial, key: 'razon_social' },
+        { header: TEXTS.proveedores.table.contacto, key: 'contacto' },
+        { header: TEXTS.proveedores.table.telefono, key: 'telefono' },
+      ],
+      rows: proveedores.map((proveedor) => ({
+        rif: proveedor.rif_cedula,
+        razon_social: proveedor.razon_social,
+        contacto: proveedor.persona_contacto ?? '',
+        telefono: proveedor.telefono ?? '',
+      })),
+    });
 
   const [editingProveedor, setEditingProveedor] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -72,7 +91,7 @@ export const ProveedoresPage = () => {
 
   return (
     <div>
-      <ProveedoresHeader total={proveedores.length} onCreate={openCreate} />
+      <ProveedoresHeader total={proveedores.length} onCreate={openCreate} onExport={handleExport} />
       <ProveedoresTable
         proveedores={proveedores}
         isLoading={isLoading}
